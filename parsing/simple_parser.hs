@@ -35,8 +35,12 @@ parseAtom = do first <- letter <|> symbol
                           "#f" -> Bool False
                           otherwise -> Atom atom
 
+parseNumber' :: Parser LispVal
+parseNumber' = liftM (Number . read) $ many1 digit
+
 parseNumber :: Parser LispVal
-parseNumber = liftM (Number . read) $ many1 digit
+parseNumber = do retval <- many1 digit
+                 return $ (Number . read) retval
 
 parseExpr :: Parser LispVal
 parseExpr = parseAtom
