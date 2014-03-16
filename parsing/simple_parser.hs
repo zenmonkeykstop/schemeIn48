@@ -38,14 +38,18 @@ parseAtom = do first <- letter <|> symbol
 parseNumber' :: Parser LispVal
 parseNumber' = liftM (Number . read) $ many1 digit
 
+parseNum :: Parser LispVal
+parseNum = do retval <- many1 digit
+              return $ (Number . read) retval
+
 parseNumber :: Parser LispVal
-parseNumber = do retval <- many1 digit
-                 return $ (Number . read) retval
+parseNumber = many1 digit >>= 
+           \x -> return $ (Number . read)  x
 
 parseExpr :: Parser LispVal
 parseExpr = parseAtom
-        <|> parseString
         <|> parseNumber
+        <|> parseString
 
 main :: IO ()
 main = do args <- getArgs
