@@ -8,10 +8,15 @@ symbol = oneOf "!$%&|*+-/:<=>?@^_~"
 spaces :: Parser ()
 spaces = skipMany1 space
 
+escapeChars :: Parser Char
+escapeChars = do char '\\'
+                 x <- oneOf ("\\\"rnt")
+                 return $ x
+
 readExpr :: String -> String
 readExpr input = case parse parseExpr "lisp" input of
     Left err -> "No match: " ++ show err
-    Right _ -> "Found value"
+    Right val -> "Found value "
 
 data LispVal = Atom String
              | List [LispVal]
@@ -22,7 +27,7 @@ data LispVal = Atom String
 
 parseString :: Parser LispVal
 parseString = do char '"'
-                 x <- many (noneOf "\"")
+                 x <- many (escapeChars <|> noneOf "\"")
                  char '"'
                  return $ String x
 
